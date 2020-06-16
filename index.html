@@ -28,7 +28,7 @@
                                 <input class="form-control" placeholder="Enter Location">
                             </div>
                             <div class="col-xs-2">    
-                                <button id="searchbtn" class="btn btn-dark">Go</button>
+                                <button id="searchBtn" class="btn btn-dark">Go</button>
                             </div>
                         </th>
                     </tr>
@@ -112,7 +112,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script type ="text/javascript">
     //on click search the database for the city in the searchbar, return data, and assign data to report locations
-//         $("#searchbtn").on("click", function(){
+//         $("#searchBtn").on("click", function(){
 
 //             var queryURL = "api.openweathermap.org/data/2.5/weather?q={city name}&appid={53f6e5db37a0164708effe3dc2b4c1f5}";
 // ​
@@ -125,18 +125,35 @@
 
 //         })
             var apiKey ="53f6e5db37a0164708effe3dc2b4c1f5"
-            var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=Philadelphia,Pennsylvania&appid=" +apiKey;
-           
+            // var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=Philadelphia,Pennsylvania&appid=" +apiKey;
+           var lat="39.952584";
+           var lon="-75.165221";
            //These below fail and give me a 400 (bad request) every time. Why?
-            // var queryURL = "https://api.openweathermap.org/data/2.5/weather?q="+cityName+"&appid=" +apiKey;
-            // var cityName = "Philadelphia,Pennsylvania";       //$("#searchbtn").val
-             
-             $.ajax({
-             url: queryURL,
-             method: "GET"
-             }).then(function(weather) {
-            console.log(weather);
-            })
+            var cityName = "Philadelphia,Pennsylvania";       //$("#searchBtn").val
+            var weatherUrl = "https://api.openweathermap.org/data/2.5/weather?q="+cityName+"&appid=" +apiKey;
+           //data provided for UV index at 12pm every day.
+            var ultravUrl = "http://api.openweathermap.org/data/2.5/uvi?appid="+apiKey+"&lat="+lat+"&lon="+lon;
+          $("#searchBtn").on("click", function (event){
+
+                $.ajax({
+                url: weatherUrl,
+                method: "GET"
+                }).then(function(weather) {
+                console.log(weather);
+                console.log("temp " + weather.main.temp);
+                console.log("humid " + weather.main.humidity);
+                console.log("speed " + weather.wind.speed);
+                
+                })
+
+                $.ajax({
+                    url: ultravUrl,
+                    method: "GET"
+                }).then(function(ultrav) {
+                    console.log("UV " + ultrav.value);
+                })
+          })   
+            
     </script>
     
 </body>
