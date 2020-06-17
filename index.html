@@ -106,9 +106,15 @@
 
          
             $("#searchBtn").on("click", function (event){
+                        //empty card for new data
+                        $("#daily-header").empty()
+                        $("#daily-temph").empty()
+                        $("#daily-templ").empty()
+                        $("#daily-humid").empty()
+                        $("#daily-wind").empty()
+                        $("#daily-uv").empty()
                 var cityName = $("#searchBox").val();
                 var geoUrl = "https://api.opencagedata.com/geocode/v1/json?q="+cityName+"&key="+apiKeygeo;
-                var weatherUrl = "https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"&lon="+lng+"&exclude={current,minutely,hourly}&appid="+apiKey;
                 $.ajax({
                    url:geoUrl,
                    method:"GET"
@@ -118,59 +124,56 @@
                    var lng = geolocate.results[0].geometry.lng;
                    console.log(lat);
                    console.log(lng);
+                   var weatherUrl = "https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"&lon="+lng+"&exclude={current,minutely,hourly}&appid="+apiKey;
+                   $.ajax({
+                    url: weatherUrl,
+                    method: "GET"
+                    }).then(function(weather) {
+                        //populate main card with data
+                        $("#daily-header").prepend(cityName+" "+date);
+                        $("#daily-temph").prepend("Temperature High: " +weather.daily[0].temp.max+"K");
+                        $("#daily-templ").prepend("Temperature Low: " +weather.daily[0].temp.min+"K");
+                        $("#daily-humid").prepend("Humidity: " +weather.daily[0].humidity+"%");
+                        $("#daily-wind").prepend("Wind Speed: " +weather.daily[0].wind_speed+"m/s");
+                        $("#daily-uv").prepend("UV Index: "  +weather.daily[0].uvi);
+                        for (i=0; i<5; i++) {   
+                            data1= ($("*[data-cnt]"));
+                            cardCount=data1[i];
+                            castDate = moment().add(i+1,'days').format('LL');
+                            var card = $("<div>");
+                            var cardBody = $("<div>");
+                            card.attr("style", "width:8rem; margin:10px");
+                            cardBody.attr("class", "card-body")
+                            var cardDate = $("<div>");        
+                            cardDate.text(castDate);
+                            var cardIcon = $("<div>");  
+                            // cardIcon.text(weather.daily[0].weather[0].id);
+                            var iconImg = $("<img>");
+                            var iconCode = weather.daily[i].weather[0].icon;
+                            var iconUrl = "http://openweathermap.org/img/w/" + iconCode + ".png";
+                            iconImg.attr('src', iconUrl);
+                            cardIcon.append(iconImg);
+                            var cardTemp = $("<div>");
+                            cardTemp.text("Temp: "+weather.daily[i].feels_like.day)
+                            var cardHumidity = $("<div>");
+                            cardHumidity.text("Humidity: "+weather.daily[i].humidity+"%");
+                            
+
+                            cardBody.append(cardDate);
+                            cardBody.append(cardIcon);
+                            cardBody.append(cardTemp);
+                            cardBody.append(cardHumidity);
+                            card.append(cardBody);
+                            $("#forecast").append(card);                
+                        }
+                
                 })
                 
-                $.ajax({
-                url: weatherUrl,
-                method: "GET"
-                }).then(function(weather) {
-                    //populate main card with data
-                    $("#daily-header").prepend(cityName+" "+date);
-                    $("#daily-temph").prepend("Temperature High: " +weather.daily[0].temp.max+"K");
-                    $("#daily-templ").prepend("Temperature Low: " +weather.daily[0].temp.min+"K");
-                    $("#daily-humid").prepend("Humidity: " +weather.daily[0].humidity+"%");
-                    $("#daily-wind").prepend("Wind Speed: " +weather.daily[0].wind_speed+"m/s");
-                    $("#daily-uv").prepend("UV Index: "  +weather.daily[0].uvi);
-                    for (i=0; i<5; i++) {   
-                        data1= ($("*[data-cnt]"));
-                        cardCount=data1[i];
-                        castDate = moment().add(i+1,'days').format('LL');
-                        var card = $("<div>");
-                        var cardBody = $("<div>");
-                        card.attr("style", "width:8rem; margin:10px");
-                        cardBody.attr("class", "card-body")
-                        var cardDate = $("<div>");        
-                        cardDate.text(castDate);
-                        var cardIcon = $("<div>");  
-                        // cardIcon.text(weather.daily[0].weather[0].id);
-                        var iconImg = $("<img>");
-                        var iconCode = weather.daily[i].weather[0].icon;
-                        var iconUrl = "http://openweathermap.org/img/w/" + iconCode + ".png";
-                        iconImg.attr('src', iconUrl);
-                        cardIcon.append(iconImg);
-                        var cardTemp = $("<div>");
-                        cardTemp.text("Temp: "+weather.daily[i].feels_like.day)
-                        var cardHumidity = $("<div>");
-                        cardHumidity.text("Humidity: "+weather.daily[i].humidity+"%");
-                        
-
-                        cardBody.append(cardDate);
-                        cardBody.append(cardIcon);
-                        cardBody.append(cardTemp);
-                        cardBody.append(cardHumidity);
-                        card.append(cardBody);
-                        $("#forecast").append(card);
-                        
-
-
-
-
-                        
-                    }       
+                       
                 })
 
                 
-          })   
+            })   
             
     </script>
     
