@@ -59,46 +59,8 @@
             <div class="row">
                 <h2>5-Day Forecast:</h2>
             </div>
-            <div class="row">
-                <div class="cast0 card" style="width:8rem; margin:10px">
-                    <div class="card-body">
-                        <div id="cast0-date" class="card-title">Date</div>
-                        <div id="cast0-icon" class="card-text">weather forecast icon</div>
-                        <div id="cast0-temp" class="card-text">Temperature:</div>
-                        <div id="cast0-humid " class="card-text">Humidity:</div>
-                    </div>
-                </div>
-                <div class="cast1 card" style="width:8rem; margin:10px">
-                    <div class="card-body">
-                        <div id="cast1-date" class="card-title">Date</div>
-                        <div id="cast1-icon" class="card-text">weather forecast icon</div>
-                        <div id="cast1-temp" class="card-text">Temperature:</div>
-                        <div id="cast1-humid " class="card-text">Humidity:</div>
-                    </div>
-                </div>
-                <div class="cast2 card" style="width:8rem; margin:10px">
-                    <div class="card-body">
-                        <div id="cast2-date" class="card-title">Date</div>
-                        <div id="cast2-icon" class="card-text">weather forecast icon</div>
-                        <div id="cast2-temp" class="card-text">Temperature:</div>
-                        <div id="cast2-humid " class="card-text">Humidity:</div>
-                    </div>
-                </div>
-                <div class="cast3 card" style="width:8rem; margin:10px">
-                    <div class="card-body">
-                        <div id="cast3-date" class="card-title">Date</div>
-                        <div id="cast3-icon" class="card-text">weather forecast icon</div>
-                        <div id="cast3-temp" class="card-text">Temperature:</div>
-                        <div id="cast3-humid " class="card-text">Humidity:</div>
-                    </div>
-                </div>
-                <div class="cast4 card" style="width:8rem; margin:10px">
-                     <div class="card-body">
-                        <div id="cast4-date" class="card-title">Date</div>
-                        <div id="cast4-icon" class="card-text">weather forecast icon</div>
-                        <div id="cast4-temp" class="card-text">Temperature:</div>
-                        <div id="cast4-humid " class="card-text">Humidity:</div>
-                    </div>
+            <div id="forecast" class="row">
+                
                 </div>
             </div>
         </section>
@@ -136,7 +98,7 @@
             var weatherUrl = "https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"&lon="+lon+"&exclude={current,minutely,hourly}&appid="+apiKey;
             
 			//format("LL") gets rid of the extra information from momentjs.
-			var now = moment().format("LL");
+			var date = moment().format("LL");
 		    
 		
          
@@ -146,24 +108,57 @@
                 url: weatherUrl,
                 method: "GET"
                 }).then(function(weather) {
-                console.log(weather);
-                console.log("temp high " + weather.daily[0].temp.max);
-                console.log("temp min " + weather.daily[0].temp.min);
-                console.log("humidity " + weather.daily[0].humidity);
-                console.log("wind speed " + weather.daily[0].wind_speed);
-                console.log("UV index " + weather.daily[0].uvi)
-                console.log("timeStamp "+weather.daily[0].dt)
-                
-                $("#daily-header").prepend(cityName+" "+now);
-                $("#daily-temph").prepend("Temperature High: " +weather.daily[0].temp.max+"K");
-                $("#daily-templ").prepend("Temperature Low: " +weather.daily[0].temp.min+"K");
-                $("#daily-humid").prepend("Humidity: " +weather.daily[0].humidity+"%");
-                $("#daily-wind").prepend("Wind Speed: " +weather.daily[0].wind_speed+"m/s");
-                $("#daily-uv").prepend("UV Index: "  +weather.daily[0].uvi);
-                var timeStamp = weather.daily[0].dt;
-                
-                console.log(timeStamp);
-               
+                    console.log(weather);
+                    console.log("temp high " + weather.daily[0].temp.max);
+                    console.log("temp min " + weather.daily[0].temp.min);
+                    console.log("humidity " + weather.daily[0].humidity);
+                    console.log("wind speed " + weather.daily[0].wind_speed);
+                    console.log("UV index " + weather.daily[0].uvi);
+                    console.log("timeStamp "+weather.daily[0].dt);
+                    //populate main card with data
+                    $("#daily-header").prepend(cityName+" "+date);
+                    $("#daily-temph").prepend("Temperature High: " +weather.daily[0].temp.max+"K");
+                    $("#daily-templ").prepend("Temperature Low: " +weather.daily[0].temp.min+"K");
+                    $("#daily-humid").prepend("Humidity: " +weather.daily[0].humidity+"%");
+                    $("#daily-wind").prepend("Wind Speed: " +weather.daily[0].wind_speed+"m/s");
+                    $("#daily-uv").prepend("UV Index: "  +weather.daily[0].uvi);
+                    for (i=0; i<5; i++) {   
+                        data1= ($("*[data-cnt]"));
+                        cardCount=data1[i];
+                        castDate = moment().add(i+1,'days').format('LL');
+                        console.log(castDate);
+                        var card = $("<div>");
+                        var cardBody = $("<div>");
+                        card.attr("style", "width:8rem; margin:10px");
+                        cardBody.attr("class", "card-body")
+                        var cardDate = $("<div>");        
+                        cardDate.text(castDate);
+                        var cardIcon = $("<div>");  
+                        // cardIcon.text(weather.daily[0].weather[0].id);
+                        var iconImg = $("<img>");
+                        var iconCode = weather.daily[i].weather[0].icon;
+                        var iconUrl = "http://openweathermap.org/img/w/" + iconCode + ".png";
+                        iconImg.attr('src', iconUrl);
+                        cardIcon.append(iconImg);
+                        var cardTemp = $("<div>");
+                        cardTemp.text("Temp: "+weather.daily[i].feels_like.day)
+                        var cardHumidity = $("<div>");
+                        cardHumidity.text("Humidity: "+weather.daily[i].humidity+"%");
+                        
+
+                        cardBody.append(cardDate);
+                        cardBody.append(cardIcon);
+                        cardBody.append(cardTemp);
+                        cardBody.append(cardHumidity);
+                        card.append(cardBody);
+                        $("#forecast").append(card);
+                        
+
+
+
+
+                        
+                    }       
                 })
 
                 
