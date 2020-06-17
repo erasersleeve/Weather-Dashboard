@@ -130,9 +130,11 @@
                     method: "GET"
                     }).then(function(weather) {
                         //populate main card with data
+                        var tempH = (weather.daily[0].temp.max -273.15) *1.80 +32;
+                        var tempL = (weather.daily[0].temp.min -273.15) *1.80 +32;
                         $("#daily-header").prepend(cityName+" "+date);
-                        $("#daily-temph").prepend("Temperature High: " +weather.daily[0].temp.max+"K");
-                        $("#daily-templ").prepend("Temperature Low: " +weather.daily[0].temp.min+"K");
+                        $("#daily-temph").prepend("Temperature High: "+tempH.toFixed(0)+"F");
+                        $("#daily-templ").prepend("Temperature Low: "+tempL.toFixed(0)+"F");
                         $("#daily-humid").prepend("Humidity: " +weather.daily[0].humidity+"%");
                         $("#daily-wind").prepend("Wind Speed: " +weather.daily[0].wind_speed+"m/s");
                         $("#daily-uv").prepend("UV Index: "  +weather.daily[0].uvi);
@@ -154,7 +156,8 @@
                             iconImg.attr('src', iconUrl);
                             cardIcon.append(iconImg);
                             var cardTemp = $("<div>");
-                            cardTemp.text("Temp: "+weather.daily[i].feels_like.day)
+                            cardTempf = (weather.daily[i].feels_like.day -273.15) *1.80 +32;
+                            cardTemp.text("Temp: "+cardTempf.toFixed(0));
                             var cardHumidity = $("<div>");
                             cardHumidity.text("Humidity: "+weather.daily[i].humidity+"%");
                             
