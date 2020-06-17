@@ -113,6 +113,7 @@
                         $("#daily-humid").empty()
                         $("#daily-wind").empty()
                         $("#daily-uv").empty()
+                        $("#forecast").empty()
                 var cityName = $("#searchBox").val();
                 var geoUrl = "https://api.opencagedata.com/geocode/v1/json?q="+cityName+"&key="+apiKeygeo;
                 $.ajax({
@@ -137,8 +138,9 @@
                         $("#daily-templ").prepend("Temperature Low: "+tempL.toFixed(0)+"F");
                         $("#daily-humid").prepend("Humidity: " +weather.daily[0].humidity+"%");
                         $("#daily-wind").prepend("Wind Speed: " +weather.daily[0].wind_speed+"m/s");
-                        $("#daily-uv").prepend("UV Index: "  +weather.daily[0].uvi);
-                        for (i=0; i<5; i++) {   
+                        $("#daily-uv").prepend("UV Index: "  +weather.daily[0].uvi);  
+                        for (i=0; i<5; i++) {  
+                             
                             data1= ($("*[data-cnt]"));
                             cardCount=data1[i];
                             castDate = moment().add(i+1,'days').format('LL');
