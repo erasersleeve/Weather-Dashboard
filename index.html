@@ -28,7 +28,7 @@
                                 <input type="text" id="searchBox" class="form-control" placeholder="Enter Location">
                             </div>
                             <div class="col-xs-2">    
-                                <button id="searchBtn" class="btn btn-dark">Go</button>
+                                <button id="searchBtn" nature="go" class="btn btn-dark">Go</button>
                             </div>
                         </th>
                     </tr>
@@ -36,11 +36,7 @@
 
 
 
-                <tbody>
-                    <tr>
-                        <td>Results Here</td>   
-                    </tr>
-                </tbody>
+                <tbody id="recentsearch"></tbody>
             </table>
         </section>
         <section class = "col-9">
@@ -74,59 +70,32 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script type ="text/javascript">
-    //on click search the database for the city in the searchbar, return data, and assign data to report locations
-//         $("#searchBtn").on("click", function(){
 
-//             var queryURL = "api.openweathermap.org/data/2.5/weather?q={city name}&appid={53f6e5db37a0164708effe3dc2b4c1f5}";
-// ​
-//             $.ajax({
-//             url: queryURL,
-//             method: "GET"
-//             }).then(function(response) {
-//             console.log(response);
-                    
-
-//         })
             var apiKey ="53f6e5db37a0164708effe3dc2b4c1f5";
-            var apiKeygeo ="1a03715b66bc48b7993507324b4592ea";
-            
-            
-            
-                       
-
-
-			//format("LL") gets rid of the extra information from momentjs.
+            var apiKeygeo = "a8e65c8af87f44eeaf1a634ebe40ef6d";
 			var date = moment().format("LL");
-		    
-		
-         
-
-
-
-
-         
-            $("#searchBtn").on("click", function (event){
-                        //empty card for new data
-                        $("#daily-header").empty()
-                        $("#daily-temph").empty()
-                        $("#daily-templ").empty()
-                        $("#daily-humid").empty()
-                        $("#daily-wind").empty()
-                        $("#daily-uv").empty()
-                        $("#forecast").empty()
-                var cityName = $("#searchBox").val();
-                var geoUrl = "https://api.opencagedata.com/geocode/v1/json?q="+cityName+"&key="+apiKeygeo;
+            var cityArray=[];
+            var citySaved = JSON.parse(localStorage.getItem("search")) || cityArray; 
+            console.log(citySaved);    
+    
+    function onl () {
+        var cityArray = citySaved;
+        var cityName = cityArray[0];
+        var q = (cityArray.length - 1)
+        console.log(cityArray[q]);
+        var cityName  = cityArray[q];
+            //empty card for new data
+            $("#daily-header").empty();$("#daily-temph").empty();$("#daily-templ").empty();$("#daily-humid").empty();$("#daily-wind").empty();$("#daily-uv").empty();$("#forecast").empty();
+             //ajax to first assign lng and lat followed by weather
+            var geoUrl = "https://api.opencagedata.com/geocode/v1/json?q="+cityName+"&key="+apiKeygeo;
                 $.ajax({
-                   url:geoUrl,
-                   method:"GET"
+                url:geoUrl,
+                method:"GET"
                 }).then(function(geolocate,){
-                   console.log(geolocate.results[0].geometry.lng);
-                   var lat = geolocate.results[0].geometry.lat;
-                   var lng = geolocate.results[0].geometry.lng;
-                   console.log(lat);
-                   console.log(lng);
-                   var weatherUrl = "https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"&lon="+lng+"&exclude={current,minutely,hourly}&appid="+apiKey;
-                   $.ajax({
+                var lat = geolocate.results[0].geometry.lat;
+                var lng = geolocate.results[0].geometry.lng;
+                var weatherUrl = "https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"&lon="+lng+"&exclude={current,minutely,hourly}&appid="+apiKey;
+                $.ajax({
                     url: weatherUrl,
                     method: "GET"
                     }).then(function(weather) {
@@ -140,21 +109,105 @@
                         $("#daily-wind").prepend("Wind Speed: " +weather.daily[0].wind_speed+"m/s");
                         $("#daily-uv").prepend("UV Index: "  +weather.daily[0].uvi);  
                         for (i=0; i<5; i++) {  
-                             
+                            
                             data1= ($("*[data-cnt]"));
                             cardCount=data1[i];
                             castDate = moment().add(i+1,'days').format('LL');
                             var card = $("<div>");
                             var cardBody = $("<div>");
-                            card.attr("style", "width:8rem; margin:10px");
-                            cardBody.attr("class", "card-body")
-                            var cardDate = $("<div>");        
-                            cardDate.text(castDate);
+                            var cardDate = $("<div>");
                             var cardIcon = $("<div>");  
-                            // cardIcon.text(weather.daily[0].weather[0].id);
                             var iconImg = $("<img>");
                             var iconCode = weather.daily[i].weather[0].icon;
                             var iconUrl = "http://openweathermap.org/img/w/" + iconCode + ".png";
+                            var cardTemp = $("<div>");
+                            var cardHumidity = $("<div>");
+                            card.attr("style", "width:8rem; margin:10px");
+                            cardBody.attr("class", "card-body")        
+                            cardDate.text(castDate);
+                            iconImg.attr('src', iconUrl);
+                            cardIcon.append(iconImg);
+                            cardTempf = (weather.daily[i].feels_like.day -273.15) *1.80 +32;
+                            cardTemp.text("Temp: "+cardTempf.toFixed(0));
+                            cardHumidity.text("Humidity: "+weather.daily[i].humidity+"%");
+                            cardBody.append(cardDate);
+                            cardBody.append(cardIcon);
+                            cardBody.append(cardTemp);
+                            cardBody.append(cardHumidity);
+                            card.append(cardBody);
+                            $("#forecast").append(card);                
+                        }
+                
+                })
+            
+                    
+            })
+        
+    }
+    
+    
+    function search () {
+            if ($(this).attr("nature")=="go"){
+            var cityName = $("#searchBox").val();
+            }
+            if ($(this).attr("nature")=="history") {
+            var cityName=$(this).attr("id");
+            }
+            
+            if (citySaved !== null && $(this).attr("nature")=="go") {
+                cityArray=citySaved;
+                    var tr=$("<tr>");
+                    var recent=$("<button>");
+                    recent.addClass("btn btn-light btnRecent");
+                    recent.text(cityName);
+                    $("#recentsearch").prepend(tr);
+                    tr.prepend(recent);   
+            }
+            //empty card for new data
+            $("#daily-header").empty();$("#daily-temph").empty();$("#daily-templ").empty();$("#daily-humid").empty();$("#daily-wind").empty();$("#daily-uv").empty();$("#forecast").empty();
+            //save to local and populate the list
+            cityArray.push(cityName);
+            localStorage.setItem("search", JSON.stringify(cityArray));
+            //ajax to first assign lng and lat followed by weather
+            var geoUrl = "https://api.opencagedata.com/geocode/v1/json?q="+cityName+"&key="+apiKeygeo;
+                $.ajax({
+                url:geoUrl,
+                method:"GET"
+                }).then(function(geolocate,){
+                var lat = geolocate.results[0].geometry.lat;
+                var lng = geolocate.results[0].geometry.lng;
+                var weatherUrl = "https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"&lon="+lng+"&exclude={current,minutely,hourly}&appid="+apiKey;
+                $.ajax({
+                    url: weatherUrl,
+                    method: "GET"
+                    }).then(function(weather) {
+                        //populate main card with data
+                        var tempH = (weather.daily[0].temp.max -273.15) *1.80 +32;
+                        var tempL = (weather.daily[0].temp.min -273.15) *1.80 +32;
+                        $("#daily-header").prepend(cityName+" "+date);
+                        $("#daily-temph").prepend("Temperature High: "+tempH.toFixed(0)+"F");
+                        $("#daily-templ").prepend("Temperature Low: "+tempL.toFixed(0)+"F");
+                        $("#daily-humid").prepend("Humidity: " +weather.daily[0].humidity+"%");
+                        $("#daily-wind").prepend("Wind Speed: " +weather.daily[0].wind_speed+"m/s");
+                        $("#daily-uv").prepend("UV Index: "  +weather.daily[0].uvi);  
+                        for (i=0; i<5; i++) {  
+                            
+                            data1= ($("*[data-cnt]"));
+                            cardCount=data1[i];
+                            castDate = moment().add(i+1,'days').format('LL');
+                            var card = $("<div>");
+                            var cardBody = $("<div>");
+                            var iconImg = $("<img>");
+                            var iconCode = weather.daily[i].weather[0].icon;
+                            var iconUrl = "http://openweathermap.org/img/w/" + iconCode + ".png";
+                            var cardDate = $("<div>");        
+                            var cardIcon = $("<div>"); 
+                            card.attr("style", "width:8rem; margin:10px");
+                            cardBody.attr("class", "card-body")
+                            cardDate.text(castDate);
+ 
+                            // cardIcon.text(weather.daily[0].weather[0].id);
+                            
                             iconImg.attr('src', iconUrl);
                             cardIcon.append(iconImg);
                             var cardTemp = $("<div>");
@@ -173,13 +226,39 @@
                         }
                 
                 })
-                
-                       
-                })
-
-                
-            })   
             
+                    
+            })
+
+            
+    }
+       
+    
+    
+
+
+    
+    
+    onl ();
+    $("#searchBtn").on("click", search);   
+     
+    if (citySaved !== null) {
+            cityArray=citySaved;
+            for(i=0; i<cityArray.length; i++) {
+                var tr=$("<tr>");
+                var recent=$("<button>");
+                var cityTitle=cityArray[i];
+                recent.addClass("btn btn-light btnRecent");
+                recent.text(cityArray[i]);
+                recent.attr("id", cityTitle);
+                recent.attr("nature", "history");
+                $("#recentsearch").prepend(tr);
+                tr.prepend(recent);
+            }
+        }
+        $(document).on("click", ".btnRecent", search);
+
+
     </script>
     
 </body>
