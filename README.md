@@ -5,7 +5,7 @@ The weather dashboard is a simple weather monitor that searches local current we
 
 
 ## Screenshots
-![1]()
+![1](https://github.com/erasersleeve/Weather-Dashboard/blob/master/Assets/Capture%20d%E2%80%99%C3%A9cran%20(29).png)
 
 ## Contributors
 Tim Winters
