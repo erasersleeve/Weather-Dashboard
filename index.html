@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script> -->
+    <!-- I've been using this download script, why did it work? -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
     <title>Weather Dashboard</title>
 </head>
@@ -72,7 +74,7 @@
     <script type ="text/javascript">
 
             var apiKey ="53f6e5db37a0164708effe3dc2b4c1f5";
-            var apiKeygeo = "a8e65c8af87f44eeaf1a634ebe40ef6d";
+            var apiKeygeo = "a8e65c8af87f44eeaf1a634ebe40ef6d"; //new key in case 99fd256c7969e6e01898fa966eff7b19
 			var date = moment().format("LL");
             var cityArray=[];
             var citySaved = JSON.parse(localStorage.getItem("search")) || cityArray; 
@@ -80,7 +82,7 @@
     
     function onl () {
         var cityArray = citySaved;
-        var cityName = cityArray[0];
+        // var cityName = cityArray[0];
         var q = (cityArray.length - 1)
         console.log(cityArray[q]);
         var cityName  = cityArray[q];
